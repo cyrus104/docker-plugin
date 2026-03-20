@@ -11,6 +11,14 @@
  */
 
 $(function () {
+  /**
+   * Safely parse an AJAX response that jQuery may have already auto-parsed.
+   * Returns the parsed object, or throws on genuinely malformed input.
+   */
+  function dockerParseJSON(data) {
+    return typeof data === "object" ? data : JSON.parse(data);
+  }
+
   /* ─────────────────────────────────────────────────────────────────────
    * Section 1 — Polling Engine
    * ──────────────────────────────────────────────────────────────────── */
@@ -1243,5 +1251,208 @@ $(function () {
     var vol = $(this).data("volume");
     var path = $(this).data("path");
     dockerVolumeBrowse(vol, path);
+  });
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * Section 7 — About Tab (Update Check & Apply)
+   * ──────────────────────────────────────────────────────────────────── */
+
+  var dockerUpdateChecked = false;
+
+  /**
+   * Check for plugin updates via GitHub Tags API.
+   *
+   * @param {boolean} force  Skip server-side cache when true
+   */
+  function dockerCheckForUpdate(force) {
+    var csrfToken = $("meta[name=csrf_token]").attr("content");
+    var $btn = $("#docker-check-update-btn");
+    var $status = $("#docker-update-status");
+
+    $btn
+      .prop("disabled", true)
+      .html(
+        '<span class="spinner-border spinner-border-sm me-1"></span>Checking…',
+      );
+
+    $.post(
+      "plugins/Docker/ajax/docker_update_check.php",
+      { force: force ? "1" : "0", csrf_token: csrfToken },
+      function (data) {
+        var json;
+        try {
+          json = dockerParseJSON(data);
+        } catch (e) {
+          json = { status: "error", message: "Failed to parse response." };
+        }
+
+        $btn
+          .prop("disabled", false)
+          .html('<i class="fas fa-sync-alt me-1"></i>Check for Updates');
+
+        if (json.status === "error") {
+          $status.html(
+            '<div class="alert alert-warning mb-0 mt-2">' +
+              '<i class="fas fa-exclamation-triangle me-1"></i>' +
+              $("<span>").text(json.message || "Unknown error").html() +
+              "</div>",
+          );
+          $("#docker-update-badge").addClass("d-none");
+          return;
+        }
+
+        if (json.update_available) {
+          var safeVersion = $("<span>")
+            .text("v" + json.latest_version)
+            .html();
+          var safeCurrent = $("<span>")
+            .text("v" + json.current_version)
+            .html();
+
+          var actionHtml;
+          if (json.can_self_update) {
+            actionHtml =
+              '<button class="btn btn-primary btn-sm mt-2" id="docker-apply-update-btn"' +
+              ' data-tag="v' +
+              $("<span>").text(json.latest_version).html() +
+              '">' +
+              '<i class="fas fa-download me-1"></i>Update to ' +
+              safeVersion +
+              "</button>";
+          } else {
+            actionHtml =
+              '<div class="mt-2 small text-muted">' +
+              "SSH into your Pi and run:" +
+              '<pre class="mb-0 mt-1 bg-light p-2 rounded" style="font-size:0.85em;">' +
+              "cd /var/www/html/plugins/Docker\n" +
+              "sudo git fetch --tags\n" +
+              "sudo git checkout " +
+              safeVersion +
+              "</pre></div>";
+          }
+
+          $status.html(
+            '<div class="alert alert-info mb-0 mt-2">' +
+              '<i class="fas fa-arrow-circle-up me-1"></i>' +
+              "<strong>Update available: " +
+              safeVersion +
+              "</strong><br>" +
+              '<small class="text-muted">Current: ' +
+              safeCurrent +
+              "</small><br>" +
+              actionHtml +
+              "</div>",
+          );
+
+          $("#docker-update-badge")
+            .removeClass("d-none bg-secondary bg-success")
+            .addClass("bg-warning text-dark")
+            .text("Update available");
+        } else {
+          $status.html(
+            '<div class="alert alert-success mb-0 mt-2">' +
+              '<i class="fas fa-check-circle me-1"></i>' +
+              "Up to date (v" +
+              $("<span>").text(json.current_version).html() +
+              ")" +
+              "</div>",
+          );
+
+          $("#docker-update-badge")
+            .removeClass("d-none bg-secondary bg-warning text-dark")
+            .addClass("bg-success")
+            .text("Up to date");
+        }
+      },
+    ).fail(function () {
+      $btn
+        .prop("disabled", false)
+        .html('<i class="fas fa-sync-alt me-1"></i>Check for Updates');
+      $status.html(
+        '<div class="alert alert-danger mb-0 mt-2">Request failed. Check your connection.</div>',
+      );
+    });
+  }
+
+  // Auto-check when About tab is shown (once per page load)
+  $(document).on("shown.bs.tab", "#docker-abouttab", function () {
+    if (!dockerUpdateChecked) {
+      dockerUpdateChecked = true;
+      dockerCheckForUpdate(false);
+    }
+  });
+
+  // Manual check button
+  $(document).on("click", "#docker-check-update-btn", function () {
+    dockerCheckForUpdate(true);
+  });
+
+  // Apply update
+  $(document).on("click", "#docker-apply-update-btn", function () {
+    var $btn = $(this);
+    var tag = $btn.data("tag");
+    var csrfToken = $("meta[name=csrf_token]").attr("content");
+
+    if (!confirm("Update plugin to " + tag + "? The page will need to be reloaded after.")) {
+      return;
+    }
+
+    $btn
+      .prop("disabled", true)
+      .html(
+        '<span class="spinner-border spinner-border-sm me-1"></span>Updating…',
+      );
+
+    $.post(
+      "plugins/Docker/ajax/docker_update_apply.php",
+      { tag: tag, csrf_token: csrfToken },
+      function (data) {
+        var json;
+        try {
+          json = dockerParseJSON(data);
+        } catch (e) {
+          json = { success: false, output: "Failed to parse response." };
+        }
+
+        if (json.success) {
+          $("#docker-update-status").html(
+            '<div class="alert alert-success mt-2">' +
+              '<i class="fas fa-check-circle me-1"></i>' +
+              "<strong>Updated successfully to " +
+              $("<span>").text(tag).html() +
+              "</strong><br>" +
+              '<pre class="mb-0 mt-1" style="font-size:0.8em;">' +
+              $("<span>").text(json.output || "").html() +
+              "</pre>" +
+              '<a href="javascript:location.reload()" class="btn btn-outline-success btn-sm mt-2">' +
+              '<i class="fas fa-redo me-1"></i>Reload page</a>' +
+              "</div>",
+          );
+          $("#docker-update-badge")
+            .removeClass("bg-warning text-dark")
+            .addClass("bg-success")
+            .text("Updated");
+        } else {
+          $btn
+            .prop("disabled", false)
+            .html('<i class="fas fa-download me-1"></i>Retry');
+          $("#docker-update-status").html(
+            '<div class="alert alert-danger mt-2">' +
+              '<i class="fas fa-times-circle me-1"></i>' +
+              "<strong>Update failed</strong><br>" +
+              '<pre class="mb-0 mt-1" style="font-size:0.8em;">' +
+              $("<span>").text(json.output || json.error || "Unknown error").html() +
+              "</pre></div>",
+          );
+        }
+      },
+    ).fail(function () {
+      $btn
+        .prop("disabled", false)
+        .html('<i class="fas fa-download me-1"></i>Retry');
+      $("#docker-update-status").html(
+        '<div class="alert alert-danger mt-2">Request failed. Check your connection.</div>',
+      );
+    });
   });
 });

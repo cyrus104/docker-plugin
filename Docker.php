@@ -74,11 +74,18 @@ class Docker implements PluginInterface
 
         $this->serviceStatus = ($daemonStatus === 'active') ? 'up' : 'down';
 
+        // Read version and plugin_uri from manifest (single source of truth)
+        $manifest = $this->readManifest();
+        $pluginVersion = $manifest['version'] ?? 'unknown';
+        $pluginUri = $manifest['plugin_uri'] ?? 'https://github.com/RaspAP/';
+
         $__template_data = [
             'title'          => $this->label,
             'description'    => _('A Docker container management plugin for RaspAP'),
             'author'         => 'RaspAP',
             'uri'            => 'https://github.com/RaspAP/',
+            'pluginUri'      => $pluginUri,
+            'pluginVersion'  => $pluginVersion,
             'icon'           => $this->icon,
             'serviceStatus'  => $this->serviceStatus,
             'serviceName'    => 'docker',
@@ -133,5 +140,15 @@ class Docker implements PluginInterface
     public static function getName(): string
     {
         return basename(str_replace('\\', '/', static::class));
+    }
+
+    private function readManifest(): array
+    {
+        $path = __DIR__ . '/manifest.json';
+        if (!file_exists($path)) {
+            return [];
+        }
+        $data = json_decode(file_get_contents($path), true);
+        return is_array($data) ? $data : [];
     }
 }

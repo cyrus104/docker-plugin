@@ -31,6 +31,18 @@
     {
       "source": "config/.gitkeep",
       "destination": "/etc/raspap/docker/compose/.gitkeep"
+    },
+    {
+      "source": "config/docker_plugin_update.sh",
+      "destination": "/etc/raspap/docker/docker_plugin_update.sh"
+    }
+  ],
+  "permissions": [
+    {
+      "file": "/etc/raspap/docker/docker_plugin_update.sh",
+      "owner": "root",
+      "group": "root",
+      "mode": "0755"
     }
   ],
   "sudoers": [
@@ -38,7 +50,8 @@
     "www-data ALL=(ALL) NOPASSWD:/usr/bin/docker compose *",
     "www-data ALL=(ALL) NOPASSWD:/bin/systemctl start docker",
     "www-data ALL=(ALL) NOPASSWD:/bin/systemctl stop docker",
-    "www-data ALL=(ALL) NOPASSWD:/bin/ls *"
+    "www-data ALL=(ALL) NOPASSWD:/bin/ls *",
+    "www-data ALL=(ALL) NOPASSWD:/etc/raspap/docker/docker_plugin_update.sh *"
   ],
   "javascript": [
     "app/js/Docker.js"
