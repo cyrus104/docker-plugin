@@ -1455,4 +1455,151 @@ $(function () {
       );
     });
   });
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * Section 8 — Container Logs Viewer
+   * ──────────────────────────────────────────────────────────────────── */
+
+  var dockerLogsInterval = null;
+  var dockerLogsContainerId = null;
+  var dockerLogsLastTimestamp = null;
+  var dockerLogsIsLive = false;
+
+  /**
+   * Fetch container logs via AJAX.
+   *
+   * @param {string}  containerId  Docker container ID or name
+   * @param {number}  tail         Number of lines for initial fetch (ignored when since is set)
+   * @param {string}  since        ISO 8601 timestamp for incremental fetch (null for initial)
+   */
+  function dockerFetchLogs(containerId, tail, since) {
+    var csrfToken = $("meta[name=csrf_token]").attr("content");
+    var params = { container_id: containerId, csrf_token: csrfToken };
+
+    if (since) {
+      params.since = since;
+    } else {
+      params.tail = tail;
+    }
+
+    $.post("plugins/Docker/ajax/docker_logs.php", params, function (data) {
+      var json;
+      try {
+        json = dockerParseJSON(data);
+      } catch (e) {
+        json = { error: "Failed to parse response." };
+      }
+
+      if (json.error) {
+        if (!since) {
+          // Only overwrite on initial fetch errors
+          $("#docker-logs-output").text("Error: " + json.error);
+        }
+        return;
+      }
+
+      var $output = $("#docker-logs-output");
+
+      if (since && json.logs) {
+        // Append new logs (live mode)
+        var current = $output.text();
+        if (current === "Loading…") {
+          $output.text(json.logs || "No logs available.");
+        } else if (json.logs.trim()) {
+          $output.text(current + json.logs);
+        }
+      } else {
+        // Initial load — replace content
+        $output.text(json.logs || "No logs available.");
+      }
+
+      // Auto-scroll to bottom in live mode
+      if (dockerLogsIsLive) {
+        $output.scrollTop($output[0].scrollHeight);
+      }
+
+      // Store server timestamp for next incremental fetch
+      if (json.timestamp) {
+        dockerLogsLastTimestamp = json.timestamp;
+      }
+    }).fail(function () {
+      if (!since) {
+        $("#docker-logs-output").text("Request failed.");
+      }
+    });
+  }
+
+  // Open logs modal when Logs button is clicked
+  $(document).on("click", ".js-container-logs", function () {
+    var id = $(this).data("id");
+    var name = $(this).data("name") || id;
+
+    dockerLogsContainerId = id;
+    dockerLogsLastTimestamp = null;
+    dockerLogsIsLive = false;
+
+    $("#docker-logs-container-name").text(name);
+    $("#docker-logs-output").text("Loading…");
+    $("#docker-logs-live-btn")
+      .removeClass("btn-danger")
+      .addClass("btn-outline-success")
+      .html('<i class="fas fa-broadcast-tower me-1"></i>Go Live');
+
+    bootstrap.Modal.getOrCreateInstance(
+      document.getElementById("docker-logs-modal"),
+    ).show();
+
+    dockerFetchLogs(id, 500, null);
+  });
+
+  // Go Live toggle
+  $(document).on("click", "#docker-logs-live-btn", function () {
+    var $btn = $(this);
+
+    if (dockerLogsIsLive) {
+      // Stop live mode
+      dockerLogsIsLive = false;
+      if (dockerLogsInterval) {
+        clearInterval(dockerLogsInterval);
+        dockerLogsInterval = null;
+      }
+      $btn
+        .removeClass("btn-danger")
+        .addClass("btn-outline-success")
+        .html('<i class="fas fa-broadcast-tower me-1"></i>Go Live');
+    } else {
+      // Start live mode
+      dockerLogsIsLive = true;
+      $btn
+        .removeClass("btn-outline-success")
+        .addClass("btn-danger")
+        .html('<i class="fas fa-stop-circle me-1"></i>Stop Live');
+
+      // Scroll to bottom immediately
+      var $output = $("#docker-logs-output");
+      $output.scrollTop($output[0].scrollHeight);
+
+      // Poll every 2 seconds for new log lines
+      dockerLogsInterval = setInterval(function () {
+        if (dockerLogsContainerId && dockerLogsLastTimestamp) {
+          dockerFetchLogs(
+            dockerLogsContainerId,
+            null,
+            dockerLogsLastTimestamp,
+          );
+        }
+      }, 2000);
+    }
+  });
+
+  // Clean up when logs modal is closed
+  $("#docker-logs-modal").on("hidden.bs.modal", function () {
+    dockerLogsIsLive = false;
+    if (dockerLogsInterval) {
+      clearInterval(dockerLogsInterval);
+      dockerLogsInterval = null;
+    }
+    dockerLogsContainerId = null;
+    dockerLogsLastTimestamp = null;
+  });
 });

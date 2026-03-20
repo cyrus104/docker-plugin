@@ -42,6 +42,11 @@
             <?php echo _('Start'); ?>
           </button>
           <?php endif; ?>
+          <button type="button" class="btn btn-sm btn-secondary js-container-logs"
+                  data-id="<?php echo htmlspecialchars($container->ID ?? ''); ?>"
+                  data-name="<?php echo htmlspecialchars($container->Names ?? ''); ?>">
+            <i class="fas fa-file-alt me-1"></i><?php echo _('Logs'); ?>
+          </button>
           <button class="btn btn-sm btn-info js-container-inspect"
                   data-id="<?php echo htmlspecialchars($container->ID ?? ''); ?>"
                   data-bs-toggle="modal"
@@ -260,5 +265,28 @@
       </div>
     </div>
   </div><!-- /#docker-create-container-modal -->
+
+  <!-- Logs Modal (80% viewport, centered) -->
+  <div class="modal fade" id="docker-logs-modal" tabindex="-1" aria-labelledby="dockerLogsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:80vw;width:80vw;">
+      <div class="modal-content" style="height:80vh;">
+        <div class="modal-header">
+          <h5 class="modal-title" id="dockerLogsModalLabel">
+            <i class="fas fa-file-alt me-2"></i><?php echo _('Logs'); ?>: <span id="docker-logs-container-name"></span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?php echo _('Close'); ?>"></button>
+        </div>
+        <div class="modal-body d-flex flex-column" style="overflow:hidden;padding:0.75rem;">
+          <pre id="docker-logs-output" class="bg-dark text-light p-3 rounded flex-grow-1" style="overflow-y:auto;font-size:0.75em;margin:0;white-space:pre-wrap;word-wrap:break-word;"></pre>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-success btn-sm" id="docker-logs-live-btn">
+            <i class="fas fa-broadcast-tower me-1"></i><?php echo _('Go Live'); ?>
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><?php echo _('Close'); ?></button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /#docker-logs-modal -->
 
 </div><!-- /.tab-pane -->
