@@ -53,6 +53,17 @@ if [[ -f "$SCRIPT_SRC" ]]; then
     chmod 755 "$SCRIPT_DST"
 fi
 
+# ── Copy JS to webroot so lighttpd serves it without PHP auth ─────────
+# lighttpd rewrites all URLs except dist|app|ajax|config through PHP.
+# plugins/ is NOT whitelisted, so JS loaded from the plugin dir would
+# hit PHP auth and fail. Copy to app/js/plugins/ where it's accessible.
+JS_SRC="${PLUGIN_DIR}/app/js/Docker.js"
+JS_DST="/var/www/html/app/js/plugins/Docker.js"
+if [[ -f "$JS_SRC" ]]; then
+    cp "$JS_SRC" "$JS_DST"
+    echo "JS copied to ${JS_DST}"
+fi
+
 # ── Restart lighttpd to clear PHP opcache ─────────────────────────────
 # Without this, PHP serves stale cached versions of template files
 # even though the on-disk files have been updated by git checkout.

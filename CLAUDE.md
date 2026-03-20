@@ -61,16 +61,20 @@ RaspAP has a two-location deployment for plugins that you MUST understand:
 | JavaScript | **Depends on script tag** | Only if loaded from plugin dir | See below |
 | Static assets (CSS, images) | Plugin directory (directly) | Yes | Browser cache-bust |
 
-### JS loading — the copy trap
+### JS loading — lighttpd rewrite constraint
 
-The PluginInstaller copies JS files to `app/js/plugins/` at install time via `copyJavaScriptFiles()`. If main.php loads from that copy (`app/js/plugins/Docker.js`), the JS is PERMANENTLY stale after any update.
+lighttpd's `50-raspap-router.conf` rewrites ALL URLs through PHP **except** paths starting with `dist|app|ajax|config`. The `plugins/` path is NOT whitelisted, so `<script src="plugins/Docker/app/js/Docker.js">` would be rewritten through PHP auth and fail to load as a static file.
 
-**Solution**: main.php MUST load JS from the plugin directory:
+**Solution**: main.php loads JS from the webroot copy at `app/js/plugins/Docker.js` (which IS in the whitelisted `app/` path). The update script (`docker_plugin_update.sh`) copies the JS file after every `git checkout` to keep this copy in sync:
+```bash
+cp plugins/Docker/app/js/Docker.js app/js/plugins/Docker.js
+```
+
 ```html
-<!-- WRONG — loads stale copy that never updates -->
+<!-- CORRECT — served directly by lighttpd (app/ is whitelisted) -->
 <script src="app/js/plugins/Docker.js"></script>
 
-<!-- CORRECT — loads directly from plugin git repo -->
+<!-- WRONG — plugins/ goes through PHP auth, JS won't load -->
 <script src="plugins/Docker/app/js/Docker.js"></script>
 ```
 
@@ -90,7 +94,7 @@ Without this, template changes (like adding `type="button"` to fix form submissi
 1. JS calls `docker_update_check.php` → PHP queries GitHub Tags API → returns latest version
 2. If update available, user clicks "Update" → JS calls `docker_update_apply.php`
 3. PHP runs `docker_plugin_update.sh` via sudo
-4. Shell script: `git fetch --tags --force` → `git checkout vX.Y.Z` → restart lighttpd
+4. Shell script: `git fetch --tags --force` → `git checkout vX.Y.Z` → copy JS to webroot → restart lighttpd
 5. User reloads page → new PHP templates and JS are active
 
 ## Key Patterns
