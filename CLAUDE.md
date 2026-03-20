@@ -1,3 +1,5 @@
+# Rules: DO NOT LIE, if you don't test it but claim it's working, that's lying. If you don't have creds for ssh or playwright, just ask don't waste time. If I don't give you the ip address or domain, don't try to wrongly login into a device that's not yours.
+
 # Docker Plugin for RaspAP
 
 A Docker container management GUI plugin for RaspAP. Provides container, image, volume, and Compose project management through the RaspAP web interface.
@@ -61,22 +63,26 @@ RaspAP has a two-location deployment for plugins that you MUST understand:
 | JavaScript | **Depends on script tag** | Only if loaded from plugin dir | See below |
 | Static assets (CSS, images) | Plugin directory (directly) | Yes | Browser cache-bust |
 
-### JS loading — lighttpd rewrite constraint
+### lighttpd rewrite whitelist
 
-lighttpd's `50-raspap-router.conf` rewrites ALL URLs through PHP **except** paths starting with `dist|app|ajax|config`. The `plugins/` path is NOT whitelisted, so `<script src="plugins/Docker/app/js/Docker.js">` would be rewritten through PHP auth and fail to load as a static file.
+lighttpd's `50-raspap-router.conf` rewrites all URLs through PHP except a whitelist: `dist|app|ajax|config|plugins`. The `plugins` entry is added by our update script because the upstream default does NOT include it. Without it, AJAX calls to `plugins/Docker/ajax/*.php` return the HTML login page instead of JSON.
 
-**Solution**: main.php loads JS from the webroot copy at `app/js/plugins/Docker.js` (which IS in the whitelisted `app/` path). The update script (`docker_plugin_update.sh`) copies the JS file after every `git checkout` to keep this copy in sync:
+The update script patches this automatically:
 ```bash
-cp plugins/Docker/app/js/Docker.js app/js/plugins/Docker.js
+sed -i 's#dist|app|ajax|config#dist|app|ajax|config|plugins#' 50-raspap-router.conf
 ```
 
-```html
-<!-- CORRECT — served directly by lighttpd (app/ is whitelisted) -->
-<script src="app/js/plugins/Docker.js"></script>
+### JS loading order — the `defer` fix
 
-<!-- WRONG — plugins/ goes through PHP auth, JS won't load -->
-<script src="plugins/Docker/app/js/Docker.js"></script>
+The plugin template renders BEFORE the upstream layout appends jQuery/Bootstrap. Without `defer`, Docker.js loads first and `$ is not defined`:
 ```
+Script #0: app/js/plugins/Docker.js  ← jQuery doesn't exist yet
+Script #1: dist/jquery/jquery.min.js ← too late
+```
+
+**Solution**: `<script defer src="app/js/plugins/Docker.js">` ensures execution after document parsing completes.
+
+The JS is also copied to `app/js/plugins/Docker.js` by the update script to keep the webroot copy in sync.
 
 ### PHP opcache — the invisible cache
 
@@ -94,7 +100,7 @@ Without this, template changes (like adding `type="button"` to fix form submissi
 1. JS calls `docker_update_check.php` → PHP queries GitHub Tags API → returns latest version
 2. If update available, user clicks "Update" → JS calls `docker_update_apply.php`
 3. PHP runs `docker_plugin_update.sh` via sudo
-4. Shell script: `git fetch --tags --force` → `git checkout vX.Y.Z` → copy JS to webroot → restart lighttpd
+4. Shell script: `git fetch --tags --force` → `git checkout vX.Y.Z` → patch lighttpd whitelist → copy JS to webroot → restart lighttpd
 5. User reloads page → new PHP templates and JS are active
 
 ## Key Patterns
