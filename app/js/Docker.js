@@ -42,7 +42,7 @@ $(function () {
         function (data) {
           var json;
           try {
-            json = JSON.parse(data);
+            json = dockerParseJSON(data);
           } catch (e) {
             return;
           }
@@ -92,7 +92,7 @@ $(function () {
       function (data) {
         var json;
         try {
-          json = JSON.parse(data);
+          json = dockerParseJSON(data);
         } catch (e) {
           json = {};
         }
@@ -127,7 +127,7 @@ $(function () {
         function (data) {
           var json;
           try {
-            json = JSON.parse(data);
+            json = dockerParseJSON(data);
           } catch (e) {
             json = {};
           }
@@ -202,7 +202,7 @@ $(function () {
     dockerImageDeleteId = $(this).data("id");
     var name = $(this).data("name") || dockerImageDeleteId;
     $("#docker-image-delete-name").text(name);
-    new bootstrap.Modal(
+    bootstrap.Modal.getOrCreateInstance(
       document.getElementById("docker-image-delete-modal"),
     ).show();
   });
@@ -229,7 +229,7 @@ $(function () {
       function (data) {
         var json;
         try {
-          json = JSON.parse(data);
+          json = dockerParseJSON(data);
         } catch (e) {
           json = {};
         }
@@ -273,7 +273,7 @@ $(function () {
       function (data) {
         var json;
         try {
-          json = JSON.parse(data);
+          json = dockerParseJSON(data);
         } catch (e) {
           json = { error: "Parse error" };
         }
@@ -407,7 +407,7 @@ $(function () {
       function (data) {
         var json;
         try {
-          json = JSON.parse(data);
+          json = dockerParseJSON(data);
         } catch (e) {
           json = {};
         }
@@ -442,7 +442,7 @@ $(function () {
 
   // Open create-container modal
   $(document).on("click", "#docker-create-container-btn", function () {
-    new bootstrap.Modal(
+    bootstrap.Modal.getOrCreateInstance(
       document.getElementById("docker-create-container-modal"),
     ).show();
   });
@@ -585,7 +585,7 @@ $(function () {
       function (data) {
         var json;
         try {
-          json = JSON.parse(data);
+          json = dockerParseJSON(data);
         } catch (e) {
           json = { error: "Unexpected response" };
         }
@@ -628,7 +628,7 @@ $(function () {
         function (data) {
           var json;
           try {
-            json = JSON.parse(data);
+            json = dockerParseJSON(data);
           } catch (e) {
             json = {};
           }
@@ -679,12 +679,18 @@ $(function () {
       function (data) {
         var json;
         try {
-          json = JSON.parse(data);
+          json = dockerParseJSON(data);
         } catch (e) {
-          json = {};
+          $("#docker-inspect-output").text("No data returned.");
+          return;
         }
 
-        var output = json.output || data;
+        var output = json.output || "";
+        if (!output) {
+          $("#docker-inspect-output").text("No inspect data returned.");
+          return;
+        }
+
         try {
           output = JSON.stringify(JSON.parse(output), null, 2);
         } catch (e) {
@@ -693,7 +699,9 @@ $(function () {
 
         $("#docker-inspect-output").text(output);
       },
-    );
+    ).fail(function () {
+      $("#docker-inspect-output").text("Request failed. Check your connection.");
+    });
   });
 
   // Open delete-container confirmation modal
@@ -701,7 +709,7 @@ $(function () {
     dockerContainerDeleteId = $(this).data("id");
     var name = $(this).data("name") || dockerContainerDeleteId;
     $("#docker-container-delete-name").text(name);
-    new bootstrap.Modal(
+    bootstrap.Modal.getOrCreateInstance(
       document.getElementById("docker-container-delete-modal"),
     ).show();
   });
@@ -725,7 +733,7 @@ $(function () {
       function (data) {
         var json;
         try {
-          json = JSON.parse(data);
+          json = dockerParseJSON(data);
         } catch (e) {
           json = {};
         }
@@ -782,7 +790,7 @@ $(function () {
         function (data) {
           var json;
           try {
-            json = JSON.parse(data);
+            json = dockerParseJSON(data);
           } catch (e) {
             json = {};
           }
@@ -865,7 +873,7 @@ $(function () {
   $(document).on("click", ".js-compose-delete", function () {
     dockerComposeDeleteProject = $(this).data("project");
     $("#compose-delete-project-name").val(dockerComposeDeleteProject);
-    new bootstrap.Modal(
+    bootstrap.Modal.getOrCreateInstance(
       document.getElementById("docker-compose-delete-modal"),
     ).show();
   });
@@ -889,7 +897,7 @@ $(function () {
       function (data) {
         var json;
         try {
-          json = JSON.parse(data);
+          json = dockerParseJSON(data);
         } catch (e) {
           json = {};
         }
@@ -970,7 +978,7 @@ $(function () {
       function (data) {
         var json;
         try {
-          json = JSON.parse(data);
+          json = dockerParseJSON(data);
         } catch (e) {
           $("#volume-files-body").html(
             '<tr><td colspan="4" class="text-danger">Failed to parse response.</td></tr>',
@@ -1128,7 +1136,7 @@ $(function () {
       function (data) {
         var json;
         try {
-          json = JSON.parse(data);
+          json = dockerParseJSON(data);
         } catch (e) {
           json = {};
         }
@@ -1174,7 +1182,7 @@ $(function () {
       "data-name",
       dockerVolumeDeleteName,
     );
-    new bootstrap.Modal(
+    bootstrap.Modal.getOrCreateInstance(
       document.getElementById("docker-volume-delete-modal"),
     ).show();
   });
@@ -1198,7 +1206,7 @@ $(function () {
       function (data) {
         var json;
         try {
-          json = JSON.parse(data);
+          json = dockerParseJSON(data);
         } catch (e) {
           json = {};
         }

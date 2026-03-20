@@ -32,12 +32,12 @@
         <td><?php echo htmlspecialchars($container->CreatedAt ?? ''); ?></td>
         <td>
           <?php if ($container->State === 'running'): ?>
-          <button class="btn btn-sm btn-warning js-all-container-stop"
+          <button type="button" class="btn btn-sm btn-warning js-all-container-stop"
                   data-id="<?php echo htmlspecialchars($container->ID ?? ''); ?>">
             <?php echo _('Stop'); ?>
           </button>
           <?php else: ?>
-          <button class="btn btn-sm btn-success js-all-container-start"
+          <button type="button" class="btn btn-sm btn-success js-all-container-start"
                   data-id="<?php echo htmlspecialchars($container->ID ?? ''); ?>">
             <?php echo _('Start'); ?>
           </button>
@@ -47,13 +47,13 @@
                   data-name="<?php echo htmlspecialchars($container->Names ?? ''); ?>">
             <i class="fas fa-file-alt me-1"></i><?php echo _('Logs'); ?>
           </button>
-          <button class="btn btn-sm btn-info js-container-inspect"
+          <button type="button" class="btn btn-sm btn-info js-container-inspect"
                   data-id="<?php echo htmlspecialchars($container->ID ?? ''); ?>"
                   data-bs-toggle="modal"
                   data-bs-target="#docker-inspect-modal">
             <?php echo _('Inspect'); ?>
           </button>
-          <button class="btn btn-sm btn-outline-danger js-all-container-delete"
+          <button type="button" class="btn btn-sm btn-danger js-all-container-delete"
                   data-id="<?php echo htmlspecialchars($container->ID ?? ''); ?>"
                   data-name="<?php echo htmlspecialchars($container->Names ?? ''); ?>">
             <?php echo _('Delete'); ?>

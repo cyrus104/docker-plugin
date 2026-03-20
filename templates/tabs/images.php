@@ -21,7 +21,7 @@
         <td><?php echo htmlspecialchars($image->Size ?? ''); ?></td>
         <td><?php echo htmlspecialchars($image->CreatedAt ?? ''); ?></td>
         <td>
-          <button class="btn btn-sm btn-outline-danger js-image-delete"
+          <button type="button" class="btn btn-sm btn-danger js-image-delete"
                   data-id="<?php echo htmlspecialchars($image->ID ?? ''); ?>"
                   data-name="<?php echo htmlspecialchars(($image->Repository ?? '') . ':' . ($image->Tag ?? '')); ?>">
             <i class="fas fa-trash-alt"></i> <?php echo _('Delete'); ?>
@@ -77,9 +77,9 @@
       <tbody id="docker-hub-results-body"></tbody>
     </table>
     <div class="d-flex align-items-center gap-2 mt-2">
-      <button class="btn btn-sm btn-outline-secondary" id="docker-hub-prev" disabled>← <?php echo _('Previous'); ?></button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" id="docker-hub-prev" disabled>← <?php echo _('Previous'); ?></button>
       <span id="docker-hub-page-info"></span>
-      <button class="btn btn-sm btn-outline-secondary" id="docker-hub-next"><?php echo _('Next'); ?> →</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" id="docker-hub-next"><?php echo _('Next'); ?> →</button>
     </div>
   </div><!-- /#docker-hub-results -->
 
