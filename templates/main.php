@@ -55,4 +55,4 @@
     </div><!-- /.card -->
   </div><!-- /.col-lg-12 -->
 </div><!-- /.row -->
-<script src="app/js/plugins/Docker.js"></script>
+<script defer src="app/js/plugins/Docker.js"></script>
