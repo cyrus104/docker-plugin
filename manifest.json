@@ -1,6 +1,6 @@
 {
   "name": "Docker",
-  "version": "v1.0.0",
+  "version": "v1.1.0",
   "description": "A Docker container management plugin for RaspAP",
   "author": "RaspAP",
   "author_uri": "https://github.com/RaspAP",
