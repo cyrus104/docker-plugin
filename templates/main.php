@@ -14,7 +14,7 @@
             <i class="<?php echo $__template_data['icon']; ?> me-2"></i><?php echo _($__template_data['title']); ?>
           </div>
           <div class="col">
-            <button class="btn btn-light btn-icon-split btn-sm service-status float-end">
+            <button type="button" class="btn btn-light btn-icon-split btn-sm service-status float-end">
               <span class="icon text-gray-600"><i class="fas fa-circle service-status-<?php echo $__template_data['serviceStatus']; ?>"></i></span>
               <span class="text service-status"><?php echo $__template_data['serviceName']; ?> <?php echo $__template_data['serviceStatus']; ?></span>
             </button>
@@ -28,13 +28,13 @@
           <?php echo \RaspAP\Tokens\CSRF::hiddenField(); ?>
 
           <!-- Nav tabs -->
-          <ul class="nav nav-tabs">
-            <li class="nav-item"><a class="nav-link active" id="docker-statustab" href="#docker-status" aria-controls="docker-status" data-bs-toggle="tab"><?php echo _("Status"); ?></a></li>
-            <li class="nav-item"><a class="nav-link" id="docker-imagestab" href="#docker-images" aria-controls="docker-images" data-bs-toggle="tab"><?php echo _("Images"); ?></a></li>
-            <li class="nav-item"><a class="nav-link" id="docker-containerstab" href="#docker-containers" aria-controls="docker-containers" data-bs-toggle="tab"><?php echo _("Containers"); ?></a></li>
-            <li class="nav-item"><a class="nav-link" id="docker-composetab" href="#docker-compose" aria-controls="docker-compose" data-bs-toggle="tab"><?php echo _("Compose"); ?></a></li>
-            <li class="nav-item"><a class="nav-link" id="docker-volumestab" href="#docker-volumes" aria-controls="docker-volumes" data-bs-toggle="tab"><?php echo _("Volumes"); ?></a></li>
-            <li class="nav-item"><a class="nav-link" id="docker-abouttab" href="#docker-about" aria-controls="docker-about" data-bs-toggle="tab"><?php echo _("About"); ?></a></li>
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item"><a class="nav-link active" id="docker-statustab" href="#docker-status" role="tab" aria-selected="true" aria-controls="docker-status" data-bs-toggle="tab"><?php echo _("Status"); ?></a></li>
+            <li class="nav-item"><a class="nav-link" id="docker-imagestab" href="#docker-images" role="tab" aria-selected="false" aria-controls="docker-images" data-bs-toggle="tab"><?php echo _("Images"); ?></a></li>
+            <li class="nav-item"><a class="nav-link" id="docker-containerstab" href="#docker-containers" role="tab" aria-selected="false" aria-controls="docker-containers" data-bs-toggle="tab"><?php echo _("Containers"); ?></a></li>
+            <li class="nav-item"><a class="nav-link" id="docker-composetab" href="#docker-compose" role="tab" aria-selected="false" aria-controls="docker-compose" data-bs-toggle="tab"><?php echo _("Compose"); ?></a></li>
+            <li class="nav-item"><a class="nav-link" id="docker-volumestab" href="#docker-volumes" role="tab" aria-selected="false" aria-controls="docker-volumes" data-bs-toggle="tab"><?php echo _("Volumes"); ?></a></li>
+            <li class="nav-item"><a class="nav-link" id="docker-abouttab" href="#docker-about" role="tab" aria-selected="false" aria-controls="docker-about" data-bs-toggle="tab"><?php echo _("About"); ?></a></li>
           </ul>
 
           <!-- Tab panes -->

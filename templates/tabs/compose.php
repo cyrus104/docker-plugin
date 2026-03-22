@@ -31,25 +31,25 @@
             <span class="badge bg-secondary" id="compose-status-<?php echo $pname; ?>">unknown</span>
           </div>
           <div class="btn-group btn-group-sm">
-            <button type="button" class="btn btn-outline-success js-compose-up"
+            <button type="button" class="btn btn-success js-compose-up"
                     data-project="<?php echo $pname; ?>" title="<?php echo _('Up'); ?>">
               <i class="fas fa-play fa-fw"></i>
             </button>
-            <button type="button" class="btn btn-outline-warning js-compose-down"
+            <button type="button" class="btn btn-warning js-compose-down"
                     data-project="<?php echo $pname; ?>" title="<?php echo _('Down'); ?>">
               <i class="fas fa-stop fa-fw"></i>
             </button>
-            <button type="button" class="btn btn-outline-secondary js-compose-restart"
+            <button type="button" class="btn btn-secondary js-compose-restart"
                     data-project="<?php echo $pname; ?>" title="<?php echo _('Restart'); ?>">
               <i class="fas fa-redo fa-fw"></i>
             </button>
-            <button type="button" class="btn btn-outline-primary js-compose-edit"
+            <button type="button" class="btn btn-info js-compose-edit"
                     data-project="<?php echo $pname; ?>"
                     data-yaml="<?php echo htmlspecialchars($project['yaml'], ENT_QUOTES, 'UTF-8'); ?>"
                     title="<?php echo _('Edit'); ?>">
               <i class="fas fa-edit fa-fw"></i>
             </button>
-            <button type="button" class="btn btn-outline-danger js-compose-delete"
+            <button type="button" class="btn btn-danger js-compose-delete"
                     data-project="<?php echo $pname; ?>" title="<?php echo _('Delete'); ?>">
               <i class="fas fa-trash fa-fw"></i>
             </button>

@@ -10,7 +10,7 @@
 
   <!-- Summary stats -->
   <div class="row mb-3 mt-3">
-    <div class="col-md-3">
+    <div class="col-6 col-md-3">
       <div class="card text-center">
         <div class="card-body py-2">
           <div class="small text-muted"><?php echo _("Daemon"); ?></div>
@@ -22,7 +22,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-6 col-md-3">
       <div class="card text-center">
         <div class="card-body py-2">
           <div class="small text-muted"><?php echo _("Running"); ?></div>
@@ -40,7 +40,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-6 col-md-3">
       <div class="card text-center">
         <div class="card-body py-2">
           <div class="small text-muted"><?php echo _("Stopped"); ?></div>
@@ -58,7 +58,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-6 col-md-3">
       <div class="card text-center">
         <div class="card-body py-2">
           <div class="small text-muted"><?php echo _("Disk Usage"); ?></div>

@@ -57,6 +57,7 @@
   <h5 class="mt-4"><?php echo _('Pull Image'); ?></h5>
   <div class="input-group mb-3">
     <input type="text" class="form-control" id="docker-hub-search-input"
+           aria-label="<?php echo _('Search Docker Hub'); ?>"
            placeholder="<?php echo _('Search Docker Hub (e.g. nginx, redis)'); ?>">
     <button class="btn btn-outline-primary" type="button" id="docker-hub-search-btn">
       <i class="fas fa-search me-1"></i><?php echo _('Search'); ?>

@@ -327,7 +327,7 @@ $(function () {
                 officialBadge +
                 "</td>" +
                 "<td>" +
-                '<button class="btn btn-sm btn-outline-primary js-hub-pull" data-image="' +
+                '<button type="button" class="btn btn-sm btn-primary js-hub-pull" data-image="' +
                 imageName +
                 '">' +
                 '<i class="fas fa-download me-1"></i>Pull' +
@@ -1107,7 +1107,11 @@ $(function () {
   $(document).on("click", "#docker-volume-create-confirm", function () {
     var name = $("#volume-create-name").val().trim();
     if (!name) {
-      alert("Volume name is required.");
+      $("#docker-volume-alert").removeClass("d-none").html(
+        '<div class="alert alert-warning alert-dismissible fade show mt-2">' +
+          "Volume name is required." +
+          '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>'
+      );
       return;
     }
 
@@ -1147,13 +1151,21 @@ $(function () {
         if (modal) modal.hide();
 
         if (json.error) {
-          alert("Error: " + json.error);
+          $("#docker-volume-alert").removeClass("d-none").html(
+            '<div class="alert alert-danger alert-dismissible fade show mt-2">' +
+              $("<span>").text(json.error).html() +
+              '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>'
+          );
         } else {
           location.reload();
         }
       },
     ).fail(function () {
-      alert("Request failed. Please try again.");
+      $("#docker-volume-alert").removeClass("d-none").html(
+        '<div class="alert alert-danger alert-dismissible fade show mt-2">' +
+          "Request failed. Please try again." +
+          '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>'
+      );
     });
   });
 
@@ -1212,7 +1224,11 @@ $(function () {
         }
 
         if (json.error) {
-          alert("Error: " + json.error);
+          $("#docker-volume-alert").removeClass("d-none").html(
+            '<div class="alert alert-danger alert-dismissible fade show mt-2">' +
+              $("<span>").text(json.error).html() +
+              '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>'
+          );
         } else {
           $("#volume-row-" + dockerVolumeDeleteName).fadeOut(400, function () {
             $(this).remove();
@@ -1220,7 +1236,11 @@ $(function () {
         }
       },
     ).fail(function () {
-      alert("Request failed. Please try again.");
+      $("#docker-volume-alert").removeClass("d-none").html(
+        '<div class="alert alert-danger alert-dismissible fade show mt-2">' +
+          "Request failed. Please try again." +
+          '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>'
+      );
     });
   });
 

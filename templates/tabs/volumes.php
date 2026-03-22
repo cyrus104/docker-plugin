@@ -8,6 +8,8 @@
     </button>
   </div>
 
+  <div id="docker-volume-alert" class="d-none"></div>
+
   <div class="table-responsive">
     <table class="table table-sm table-hover align-middle" id="docker-volumes-table">
       <thead class="table-light">
@@ -45,13 +47,13 @@
               <td><?php echo $vcreated; ?></td>
               <td>
                 <div class="btn-group btn-group-sm">
-                  <button type="button" class="btn btn-outline-secondary js-volume-inspect"
+                  <button type="button" class="btn btn-secondary js-volume-inspect"
                           data-name="<?php echo $vname; ?>"
                           data-bs-toggle="modal" data-bs-target="#docker-volume-inspect-modal"
                           title="<?php echo _('Inspect'); ?>">
                     <i class="fas fa-search fa-fw"></i>
                   </button>
-                  <button type="button" class="btn btn-outline-danger js-volume-delete"
+                  <button type="button" class="btn btn-danger js-volume-delete"
                           data-name="<?php echo $vname; ?>"
                           title="<?php echo _('Delete'); ?>">
                     <i class="fas fa-trash fa-fw"></i>
@@ -145,12 +147,12 @@
         <!-- Inner nav tabs -->
         <ul class="nav nav-tabs mb-3" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#vi-details"
-                    type="button" role="tab"><?php echo _('Details'); ?></button>
+            <button type="button" class="nav-link active" data-bs-toggle="tab" data-bs-target="#vi-details"
+                    role="tab"><?php echo _('Details'); ?></button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vi-files"
-                    type="button" role="tab"><?php echo _('Files'); ?></button>
+            <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#vi-files"
+                    role="tab"><?php echo _('Files'); ?></button>
           </li>
         </ul>
         <div class="tab-content">

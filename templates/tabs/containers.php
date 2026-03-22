@@ -7,6 +7,7 @@
     </button>
   </div>
 
+  <div class="table-responsive">
   <table class="table table-sm table-hover" id="docker-all-containers-table">
     <thead>
       <tr>
@@ -66,6 +67,7 @@
       <?php endif; ?>
     </tbody>
   </table>
+  </div><!-- /.table-responsive -->
 
   <!-- Inspect Modal -->
   <div class="modal fade" id="docker-inspect-modal" tabindex="-1" aria-labelledby="dockerInspectModalLabel" aria-hidden="true">
@@ -77,6 +79,9 @@
         </div>
         <div class="modal-body">
           <pre id="docker-inspect-output" class="bg-dark text-light p-3 rounded" style="max-height:400px;overflow-y:auto;font-size:0.8em;"></pre>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo _('Close'); ?></button>
         </div>
       </div>
     </div>
@@ -138,7 +143,7 @@
             <div class="tab-pane fade show active" id="cc-basic" role="tabpanel">
               <div class="mb-3">
                 <label for="cc-image" class="form-label"><?php echo _('Image'); ?> <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="cc-image" required placeholder="e.g. nginx:latest">
+                <input type="text" class="form-control" id="cc-image" placeholder="e.g. nginx:latest">
               </div>
               <div class="mb-3">
                 <label for="cc-name" class="form-label"><?php echo _('Container Name'); ?> <span class="text-muted">(<?php echo _('optional'); ?>)</span></label>
